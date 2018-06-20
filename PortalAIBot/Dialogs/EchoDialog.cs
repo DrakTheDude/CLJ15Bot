@@ -22,6 +22,16 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
         {
             var message = await argument;
 
+            if (message.Text == "help")
+            {
+                PromptDialog.Confirm(
+                    context,
+                    AfterHelpAsync,
+                    "Are you sure you want to get help?",
+                    "Didn't get that!",
+                    promptStyle: PromptStyle.Auto);
+            }
+
             if (message.Text == "reset")
             {
                 PromptDialog.Confirm(
@@ -53,5 +63,19 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
             context.Wait(MessageReceivedAsync);
         }
 
+        public async Task AfterHelpAsync(IDialogContext context, IAwaitable<bool> argument)
+        {
+            var confirm = await argument;
+            if (confirm)
+            {
+                this.count = 1;
+                await context.PostAsync("Sending message to RSPROD. Please stand by someone will conatct you shortly!");
+            }
+            else
+            {
+                await context.PostAsync("Help declined.");
+            }
+            context.Wait(MessageReceivedAsync);
+        }
     }
 }
